@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CHIIRP Demo – Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     BODY & ROTATING BACKDROP
+  ───────────────────────────────────────────────────────────────────────────── */
+  body {
+    position: relative;      /* for the pseudo-element */
+    overflow: hidden;
+    font-family: system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;      /* no horizontal scroll */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 50%; left: 50%;
+    /* make it exactly big enough so its diagonal ≥ viewport diagonal */
+    width:  calc(100vw + 100vh);
+    height: calc(100vw + 100vh);
+    background: linear-gradient(130deg, #00b7ff 0%, #00e05f 100%);
+    transform: translate(-50%, -50%) rotate(0deg);
+    transform-origin: center center;
+    z-index: -1;
+    animation: spin-bg 5s linear infinite;
+  }
+  @keyframes spin-bg {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+
+
+
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     SLIDE WRAPPER
+  ───────────────────────────────────────────────────────────────────────────── */
+  .slide {
+    width: min(94vw, 900px);
+    text-align: center;
+    padding: 2rem;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     HEADINGS
+  ───────────────────────────────────────────────────────────────────────────── */
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    letter-spacing: 2px;
+    text-shadow: 0 2px 6px #0006;
+  }
+  h2 {
+    margin-top: .8rem;
+    font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+    font-weight: 400;
+    letter-spacing: .2rem;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     INPUT ROW
+  ───────────────────────────────────────────────────────────────────────────── */
+  .input-row {
+    margin-top: 2.3rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .input-row input {
+    flex: 1 1 180px;
+    padding: .9rem;
+    border: none;
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     BUTTONS
+  ───────────────────────────────────────────────────────────────────────────── */
+  button {
+    margin-top: 2rem;
+    padding: .9rem 1.8rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #ffb703;
+    color: #002844;
+    font-weight: 700;
+    transition: opacity .25s;
+  }
+  button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     RESULT ITEMS ANIMATION
+  ───────────────────────────────────────────────────────────────────────────── */
+  .valItem {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: transform .6s ease, opacity .6s ease;
+  }
+  .valItem.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     GUIDE PANEL
+  ───────────────────────────────────────────────────────────────────────────── */
+  .guide {
+    margin-top: 2.5rem;
+    width: 100%;
+    background: rgba(255,255,255,.12);
+    border-radius: 10px;
+    padding: 1.4rem 1.2rem;
+    backdrop-filter: blur(6px);
+  }
+  .guide h3 {
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+    letter-spacing: .08rem;
+  }
+  .guide table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+  .guide th, .guide td {
+    padding: .45rem .55rem;
+    text-align: left;
+  }
+  .guide th {
+    border-bottom: 1px solid #ffffff55;
+    font-weight: 600;
+  }
+  .guide td:first-child {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     HIDE NUMBER-INPUT SPINNERS
+  ───────────────────────────────────────────────────────────────────────────── */
+  input::-webkit-inner-spin-button,
+  input::-webkit-outer-spin-button {
+    display: none;
+  }
+
+  
+</style>
+
+
+</head>
+<body>
+
+<!-- ────────────────  SLIDE 1 – INPUTS ──────────────── -->
+<section class="slide" id="slideInputs">
+  <h1>CHIIRP DEMO</h1>
+  <h2>SEE&nbsp;YOUR&nbsp;SAVINGS&nbsp;WITH&nbsp;CHIIRP</h2>
+
+  <!-- field inputs -->
+  <div class="input-row">
+    <input id="leads"      type="number" step="1"     placeholder="Monthly leads (all sources)">
+    <input id="missPct"    type="number" step="0.1"   placeholder="Missed lead %">
+    <input id="quotes"     type="number" step="1"     placeholder="Quotes sent / month">
+    <input id="closeRate"  type="number" step="0.1"   placeholder="Current close %">
+    <input id="avgRev"     type="number" step="0.01"  placeholder="Avg revenue / sale $">
+  </div>
+
+  <!-- explanatory key -->
+  <div class="guide">
+    <h3>What each field means</h3>
+    <table>
+      <thead>
+        <tr><th>Variable</th><th>Plain-English prompt</th><th>How we reuse it</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Leads</td><td>How many new prospects you get per month (all sources)</td><td>Feeds Speed-to-Lead and sets the base for Missed-Call math</td></tr>
+        <tr><td>Missed %</td><td>About what % of those prospects you never reach live</td><td>Calculates Missed = Leads × Missed % ; Reached = Leads − Missed</td></tr>
+        <tr><td>Quotes</td><td>How many price quotes / estimates you send per month</td><td>Drives Estimation Follow-Up</td></tr>
+        <tr><td>Close %</td><td>% of reached prospects (or quoted jobs) that turn into sales today</td><td>Baseline close rate for all three modules</td></tr>
+        <tr><td>AvgRev $</td><td>Average revenue per new customer ($)</td><td>Converts extra deals to dollars everywhere</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button id="calcBtn" disabled>Next ➔</button>
+</section>
+
+<!-- ────────────────  SLIDE 2 – ESTIMATION ──────────────── -->
+<section class="slide" id="slideEst" style="display:none;opacity:0;transition:opacity .6s">
+  <h1>Estimation Follow-Up</h1>
+
+  <!-- dynamic results injected by JS -->
+  <div id="estValues" style="margin:2rem 0;font-size:1.4rem;line-height:2"></div>
+
+  <!-- optional: show the exact formulas driving the numbers -->
+  <details style="margin:1.5rem 0 0;font-size:.9rem;text-align:left">
+    <summary style="cursor:pointer;font-weight:600">How these numbers are calculated</summary>
+    <pre style="white-space:pre-wrap;line-height:1.5;margin-top:.8rem">
+Baseline wins      = Quotes × Close %
+Wins with Chiirp   = Quotes × Close % × Uplift
+Incremental wins   = Wins with Chiirp − Baseline wins
+Monthly revenue    = Incremental wins × Avg Revenue
+        </pre>
+  </details>
+
+  <button id="toS2L">Next ➔</button>
+</section>
+
+
+<!-- ────────────────  SLIDE 3 – SPEED-TO-LEAD ──────────────── -->
+<section class="slide" id="slideS2L" style="display:none;opacity:0;transition:opacity .6s">
+  <h1>Speed-to-Lead</h1>
+
+  <!-- dynamic results injected by JS -->
+  <div id="s2lValues" style="margin:2rem 0;font-size:1.4rem;line-height:2"></div>
+
+  <!-- optional transparency panel -->
+  <details style="margin:1.5rem 0 0;font-size:.9rem;text-align:left">
+    <summary style="cursor:pointer;font-weight:600">
+      How these numbers are calculated
+    </summary>
+    <pre style="white-space:pre-wrap;line-height:1.5;margin-top:.8rem">
+Reached leads        = Total leads − Missed leads
+Baseline wins        = Reached × Close %
+Wins with Chiirp     = Reached × Uplift close %
+Incremental wins     = Wins with Chiirp − Baseline wins
+Monthly revenue gain = Incremental wins × Avg Revenue
+    </pre>
+  </details>
+
+  <button id="toMissed">Next ➔</button>
+</section>
+
+
+<!-- ────────────────  SLIDE 4 – MISSED CALLS ──────────────── -->
+<section class="slide" id="slideMissed"
+         style="display:none;opacity:0;transition:opacity .6s">
+  <h1>Abandoned-Call Recovery</h1>
+
+  <!-- dynamic results from JS -->
+  <div id="missValues"
+       style="margin:2rem 0;font-size:1.4rem;line-height:2"></div>
+
+  <!-- transparency panel (optional) -->
+  <details style="margin:1.5rem 0 0;font-size:.9rem;text-align:left">
+    <summary style="cursor:pointer;font-weight:600">
+      How these numbers are calculated
+    </summary>
+    <pre style="white-space:pre-wrap;line-height:1.5;margin-top:.8rem">
+Missed contacts       = Total leads × Missed %
+Baseline wins         = Missed × Close %
+Wins with Chiirp      = Missed × Uplift close %
+Incremental wins      = Wins with Chiirp − Baseline wins
+Monthly revenue gain  = Incremental wins × Avg Revenue
+    </pre>
+  </details>
+
+  <button id="toSum">Next ➔</button>
+</section>
+
+
+<!-- ────────────────  SLIDE 5 – SUMMARY ──────────────── -->
+<section class="slide" id="slideSum"
+         style="display:none;opacity:0;transition:opacity .6s">
+  <h1>Total Monthly Gain</h1>
+
+  <!-- populated by JS -->
+  <div id="sumValues"
+       style="margin:2rem 0;font-size:1.6rem;line-height:2"></div>
+
+  <!-- optional: reveal the math behind the totals -->
+  <details style="margin:1.5rem 0 0;font-size:.9rem;text-align:left">
+    <summary style="cursor:pointer;font-weight:600">
+      How these numbers are calculated
+    </summary>
+    <pre style="white-space:pre-wrap;line-height:1.5;margin-top:.8rem">
+Low monthly gain   = Est_Low  + S2L_Low  + Miss_Low
+High monthly gain  = Est_High + S2L_High + Miss_High
+
+ROI (low)          = Low gain  ÷ Monthly cost
+ROI (high)         = High gain ÷ Monthly cost
+    </pre>
+  </details>
+
+  <button onclick="location.reload()">Restart ↻</button>
+</section>
+
+
+<script>
+(()=>{
+
+/* ── CONSTANTS ───────────────────────────────────────── */
+const UPLIFT = {
+  estLow:1.5, estHigh:2.0,
+  s2lLow:0.15, s2lHigh:0.35,      // close-rates on reached leads
+  missLow:0.20, missHigh:0.40     // close-rates on missed leads
+};
+const MONTHLY_COST = 500;
+
+/* ── DOM SHORTCUTS ───────────────────────────────────── */
+const g   = id=>document.getElementById(id);
+const inputs = ['leads','missPct','quotes','closeRate','avgRev'].map(g);
+
+/* enable calc button when all inputs filled */
+const calcBtn=g('calcBtn');
+inputs.forEach(i=>i.addEventListener('input',()=>calcBtn.disabled=inputs.some(e=>!e.value.trim())));
+
+/* ── MAIN CALCULATION ────────────────────────────────── */
+calcBtn.addEventListener('click',()=>{
+
+  /* CLIENT INPUTS */
+  const Leads   = +g('leads').value;
+  const MissPct = (+g('missPct').value)/100;
+  const Quotes  = +g('quotes').value;
+  const CR0     = (+g('closeRate').value)/100;
+  const AR      = +g('avgRev').value;
+
+  /* DERIVED COUNTS */
+  const Missed  = Leads * MissPct;
+  const Reached = Leads - Missed;
+
+  /* ------- 1. ESTIMATION FOLLOW-UP ------- */
+  const estBw = Quotes * CR0;
+  const estSwLow  = Quotes * CR0 * UPLIFT.estLow;
+  const estSwHigh = Quotes * CR0 * UPLIFT.estHigh;
+  const estΔLow   = estSwLow  - estBw;
+  const estΔHigh  = estSwHigh - estBw;
+  const est$Low   = estΔLow  * AR;
+  const est$High  = estΔHigh * AR;
+  g('estValues').innerHTML = [
+    `Closed now: ${estBw.toFixed(1)}`,
+    `With Chiirp (low): ${estSwLow.toFixed(1)}`,
+    `With Chiirp (high): ${estSwHigh.toFixed(1)}`,
+    `monthly gain: $${est$Low.toLocaleString()} – $${est$High.toLocaleString()}`
+  ].map(t=>`<div class="valItem">${t}</div>`).join('');
+  revealSlide('slideEst');
+
+  /* ------- 2. SPEED-TO-LEAD ------- */
+  g('toS2L').onclick=()=>{
+    const s2lBw = Reached * CR0;
+    const s2lSwLow  = Reached * UPLIFT.s2lLow;
+    const s2lSwHigh = Reached * UPLIFT.s2lHigh;
+    const s2lΔLow   = s2lSwLow  - s2lBw;
+    const s2lΔHigh  = s2lSwHigh - s2lBw;
+    const s2l$Low   = s2lΔLow  * AR;
+    const s2l$High  = s2lΔHigh * AR;
+
+    g('s2lValues').innerHTML = [
+      `Reached leads / mo: ${Reached}`,
+      `Closed now: ${s2lBw.toFixed(1)}`,
+      `With Chiirp (low): ${s2lSwLow.toFixed(1)}`,
+      `With Chiirp (high): ${s2lSwHigh.toFixed(1)}`,
+      `monthly gain: $${s2l$Low.toLocaleString()} – $${s2l$High.toLocaleString()}`
+    ].map(t=>`<div class="valItem">${t}</div>`).join('');
+    revealSlide('slideS2L');
+
+    /* ------- 3. ABANDONED CALL ------- */
+    g('toMissed').onclick=()=>{
+      const missBw = Missed * CR0;
+      const missSwLow  = Missed * UPLIFT.missLow;
+      const missSwHigh = Missed * UPLIFT.missHigh;
+      const missΔLow   = missSwLow  - missBw;
+      const missΔHigh  = missSwHigh - missBw;
+      const miss$Low   = missΔLow  * AR;
+      const miss$High  = missΔHigh * AR;
+
+      g('missValues').innerHTML = [
+        `Missed contacts / mo: ${Missed.toFixed(1)}`,
+        `Closed now: ${missBw.toFixed(1)}`,
+        `With Chiirp (low): ${missSwLow.toFixed(1)}`,
+        `With Chiirp (high): ${missSwHigh.toFixed(1)}`,
+        `monthly gain: $${miss$Low.toLocaleString()} – $${miss$High.toLocaleString()}`
+      ].map(t=>`<div class="valItem">${t}</div>`).join('');
+      revealSlide('slideMissed');
+
+      /* ------- 4. SUMMARY ------- */
+      g('toSum').onclick=()=>{
+        const lowGain  = est$Low + s2l$Low + miss$Low;
+        const highGain = est$High + s2l$High + miss$High;
+        const roiLow   = (lowGain / MONTHLY_COST).toFixed(1);
+        const roiHigh  = (highGain / MONTHLY_COST).toFixed(1);
+        g('sumValues').innerHTML = [
+          `Total monthly revenue lift:`,
+          `$${lowGain.toLocaleString()} – $${highGain.toLocaleString()}`,
+          `Estimated ROI range: ${roiLow}× – ${roiHigh}×`
+        ].map(t=>`<div class="valItem show">${t}</div>`).join('');
+        revealSlide('slideSum');
+      };
+    };
+  };
+});
+
+/* ── helper to fade-in slide and animate items ── */
+function revealSlide(id){
+  document.querySelectorAll('.slide').forEach(s=>s.style.display='none');
+  const el=g(id); el.style.display='block'; requestAnimationFrame(()=>el.style.opacity=1);
+  setTimeout(()=>el.querySelectorAll('.valItem').forEach((v,i)=>setTimeout(()=>v.classList.add('show'),200+i*250)),400);
+}
+
+})();
+</script>
+</body>
+</html>
