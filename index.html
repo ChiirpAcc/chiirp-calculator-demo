@@ -238,7 +238,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3                                                                  */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3                                                                  */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -460,16 +460,6 @@
           <tbody id="estValues"><!-- JS injects rows here --></tbody>
         </table>
 
-        <details class="calc-formula">
-          <summary>How these numbers are calculated</summary>
-<pre>
-Quotes / mo          = Q
-Chiirp wins (low)    = max(Q × 0.10, W₃)
-Chiirp wins (high)   = max(Q × 0.20, W₃)
-Incremental wins     = Chiirp wins − W₃
-Monthly revenue      = Incremental wins × AR
-</pre>
-        </details>
       </div>
 
       <!-- RIGHT CARD -->
@@ -517,16 +507,6 @@ Monthly revenue      = Incremental wins × AR
             <!-- Rows will be injected here -->
           </tbody>
         </table>
-        <details class="calc-formula">
-          <summary>How these numbers are calculated</summary>
-          <pre>
-Form submissions / mo = F
-Chiirp wins (low)     = max(F × 15%, W₁)
-Chiirp wins (high)    = max(F × 35%, W₁)
-Incremental wins      = Chiirp wins − W₁
-Monthly revenue       = Incremental wins × AR
-          </pre>
-        </details>
       </div>
 
       <!-- RIGHT CARD: highlight + button -->
@@ -569,16 +549,6 @@ Monthly revenue       = Incremental wins × AR
             <!-- JS injects rows here -->
           </tbody>
         </table>
-        <details class="calc-formula">
-          <summary>How these numbers are calculated</summary>
-          <pre>
-Abandoned calls / mo = M
-Chiirp wins (low)    = max(M × 20%, W₂)
-Chiirp wins (high)   = max(M × 40%, W₂)
-Incremental wins     = Chiirp wins − W₂
-Monthly revenue      = Incremental wins × AR
-          </pre>
-        </details>
       </div>
 
       <!-- RIGHT CARD: highlight + button -->
@@ -622,18 +592,6 @@ Monthly revenue      = Incremental wins × AR
               etc. -->
           </tbody>
         </table>
-        <details style="margin-top:1.5rem; font-size:.9rem; text-align:left">
-          <summary style="cursor:pointer; font-weight:600">
-            How these numbers are calculated
-          </summary>
-          <pre style="white-space:pre-wrap; line-height:1.5; margin-top:.8rem">
-Low monthly gain   = Est_Low  + S2L_Low  + Miss_Low
-High monthly gain  = Est_High + S2L_High + Miss_High
-
-ROI (low)          = Low monthly gain  ÷ Monthly cost
-ROI (high)         = High monthly gain ÷ Monthly cost
-          </pre>
-        </details>
       </div>
 
 <!-- RIGHT CARD: totals & ROI highlight + footer -->
