@@ -169,12 +169,16 @@
 }
 .slide .slide-content.estimation .highlight-pair p { margin: 0; }
 
-/* big yellow numbers (same size as before) */
+/* big yellow numbers – one line, bolded with shadow */
 .slide .slide-content.estimation .highlight-number {
   font-size: clamp(3.2rem, 7vw, 5rem);
-  white-space: nowrap;      /* keep entire “$9,000 – $19,000” on one line */
+  white-space: nowrap;           /* keep range on one line */
   line-height: 1.05;
+  color: #ffeb3b;                /* yellow */
+  font-weight: 700;              /* bold */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);  /* slight shadow */
 }
+
 
 /* uppercase labels */
 .slide .slide-content.estimation .subtext {
@@ -237,7 +241,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3                                                                  */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3                                                                  */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -385,12 +389,16 @@
   gap:.25rem;
 }
 
-/* 2 ▸ big yellow numbers – keep on one line */
+/* 2 ▸ big yellow numbers – one line, bold with shadow */
 .slide .slide-content.estimation .highlight-number {
   font-size: clamp(3.2rem, 7vw, 5rem);
-  white-space: nowrap;    /* don’t wrap at the dash */
+  white-space: nowrap;           /* keep the full range on one line */
   line-height: 1.05;
+  color: #ffeb3b;                /* yellow */
+  font-weight: 700;              /* bold */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);  /* slight drop shadow */
 }
+
 
 /* 3 ▸ MONTHLY / ANNUAL label */
 .slide .slide-content.estimation .subtext{
