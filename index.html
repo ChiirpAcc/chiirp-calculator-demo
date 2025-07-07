@@ -81,25 +81,27 @@
 
 /* 2) Shrink-wrap the outer card ─── add position:relative */
 .slide .slide-content.estimation {
-  position: relative;             /* ← this anchors absolute children */
+  position: relative;
   background: rgba(255,255,255,0.1);
   border-radius: 12px;
   padding: 2rem;
-  width: max-content;
+  /* width: max-content; */    /* ← remove this so the card can grow/shrink fluidly */
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
   margin: 0;
-  padding-bottom: 6rem;           /* extra space under content */
+  padding-bottom: 6rem;
 }
 
-/* ─── 3) Two-column inner grid with generous gutter ─── */
+
+/* 3) Two-column inner grid with generous gutter */
 .slide .slide-content.estimation .est-grid {
   display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 5rem;           /* ← 2rem keeps them perfectly apart */
-  width: max-content;
+  grid-template-columns: 360px auto;  /* left fixed, right just big enough for its content */
+  gap: 5rem;
+  /* width: max-content; */           /* no longer needed */
   margin: 0;
-  align-items: stretch; /* equalize card heights */
+  align-items: stretch;
 }
+
 
 /* ─── 4) Common card styles ─── */
 .slide .slide-content.estimation .est-card {
@@ -241,7 +243,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3                                                                  */
+    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3                                                                  */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
