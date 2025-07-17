@@ -744,7 +744,7 @@
     const l = Number(lo)||0;
     const h = Number(hi)||0;
     const fmt = n => Number(n).toFixed(1);
-    return l <= 0
+    return l <= 1
       ? `Up to ${fmt(h)}×`
       : `${fmt(l)}× – ${fmt(h)}×`;
   }
