@@ -419,6 +419,32 @@
 
 
 </style>
+/* make slideSum a positioning context for sum-footer if needed */
+#slideSum { position: relative; }
+
+/* Back button row – centred under the cards */
+#slideSum .sum-footer{
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* Restart button pinned bottom-right of the viewport */
+.restartBtn{
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+/* mobile tweaks */
+@media (max-width: 480px){
+  .restartBtn{
+    bottom: 1.2rem;
+    right: 1.2rem;
+    padding: .7rem 1.4rem;
+  }
+}
 
 
 </head>
@@ -627,14 +653,17 @@
       </div><!-- /.highlight-table -->
     </div><!-- /.est-grid -->
 
-    <!-- NEW FOOTER BELOW BOTH CARDS -->
+    <!-- centred Back button below the cards -->
     <div class="sum-footer">
       <button id="backToMissed" class="backBtn">← Back</button>
-      <button onclick="location.reload()">Restart ↻</button>
     </div>
 
   </div><!-- /.slide-content.estimation -->
+
+  <!-- fixed Restart button, bottom-right -->
+  <button class="restartBtn" onclick="location.reload()">Restart ↻</button>
 </section>
+
 
 
 
