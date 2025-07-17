@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -420,8 +420,7 @@
   padding-left:.25rem;               /* tiny indent so it clears the “$”  */
 }
 
-
-/* summary slide becomes positioning context */
+/* slideSum is positioning context */
 #slideSum{ position:relative; }
 
 /* Back button row */
@@ -431,7 +430,13 @@
   justify-content:center;
 }
 
-/* Restart button: fixed lower-right */
+/* tighter padding only for this Back button */
+#slideSum .backBtn{
+  padding-left:1.2rem;
+  padding-right:1.2rem;
+}
+
+/* Restart button fixed bottom-right */
 .restartBtn{
   position:fixed;
   bottom:2rem;
@@ -448,6 +453,7 @@
     padding:.7rem 1.4rem;
   }
 }
+
 
 
 
