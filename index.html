@@ -192,20 +192,23 @@
 /* hide ROI block on non-summary slides (keep it on #slideSum) */
 .slide:not(#slideSum) #sumROIPair,
 .slide:not(#slideSum) #sumROI { display: none; }
-
-/* 7) Footer button ─── make it absolute again */
+  
+/* 7) Footer buttons – absolute, two-button row */
 .slide .slide-content.estimation .highlight-footer {
   position: absolute;
-  bottom: 1.5rem;                 /* tweak as you like */
+  bottom: 1.5rem;          /* adjust if you prefer */
   left: 50%;
   transform: translateX(-50%);
+  display: flex;           /* row layout */
+  gap: 1rem;               /* space between Back and Next */
+  justify-content: center; /* keep centred as a group */
   width: auto;
-  text-align: center;
   pointer-events: auto;
-  margin-top: 0;                  /* remove the old flex push */
+  margin-top: 0;
+  text-align: center;      /* harmless with flex */
 }
-  
-/* ─── 8) Responsive: stack on mobile ─── */
+
+/* 8) Responsive: stack content, give each button 50 % width */
 @media (max-width: 640px) {
   .slide .slide-content.estimation .est-grid {
     grid-template-columns: 1fr;
@@ -214,9 +217,10 @@
     margin-bottom: 2rem;
   }
   .slide .slide-content.estimation .highlight-footer button {
-    width: 100%;
+    flex: 1 1 50%;         /* each button fills half the row */
   }
 }
+
 
 
   
@@ -242,7 +246,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3                                                                  */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3                                                                  */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -486,7 +490,8 @@
 
       <!-- FOOTER BUTTON -->
       <div class="highlight-footer">
-        <button id="toS2L">Next ➔</button>
+        <button class="prevBtn" id="toInputs">Back to inputs</button>
+        <button class="nextBtn" id="toS2L">Next ➔</button>
       </div>
 
     </div><!-- end .est-grid -->
@@ -528,8 +533,10 @@
             <p class="subtext">per year</p>
           </div>
         </div>
+        <!-- slideS2L  (Speed-to-Lead) -->
         <div class="highlight-footer">
-          <button id="toMissed">Next ➔</button>
+          <button id="backToEst"  class="backBtn">← Back</button>
+          <button id="toMissed"   class="nextBtn">Next ➔</button>
         </div>
       </div>
 
@@ -570,8 +577,10 @@
             <p class="subtext">per year</p>
           </div>
         </div>
+        <!-- slideMissed  (Call Recovery) -->
         <div class="highlight-footer">
-          <button id="toSum">Next ➔</button>
+          <button id="backToS2L" class="backBtn">← Back</button>
+          <button id="toSum"     class="nextBtn">Next ➔</button>
         </div>
       </div>
 
@@ -624,9 +633,10 @@
   </div>
 
   <!-- footer: just the restart button -->
-  <div class="highlight-footer">
-    <button onclick="location.reload()">Restart ↻</button>
-  </div>
+    <div class="highlight-footer">
+      <button id="backToMissed" class="backBtn">← Back</button>
+      <button onclick="location.reload()">Restart ↻</button>
+    </div>
 </div>
 
 
@@ -718,7 +728,7 @@ g('toMissed').addEventListener('click', () => {
   const AR = +g('avgRev').value;
 
   const lowWins  = Math.max(M * 0.20, W2);
-  const highWins = Math.max(M * 0.40, W2);
+  const highWins = Math.max(M * 0.35, W2);
 
   revLowMiss  = (lowWins  - W2) * AR;
   revHighMiss = (highWins - W2) * AR;
@@ -758,6 +768,12 @@ g('toSum').addEventListener('click', () => {
 
   revealSlide('slideSum');
 });
+
+    /* ────────── Back buttons ────────── */
+g('backToInputs').addEventListener('click', () => revealSlide('slideInputs'));
+g('backToEst').addEventListener('click',    () => revealSlide('slideEst'));
+g('backToS2L').addEventListener('click',    () => revealSlide('slideS2L'));
+g('backToMissed').addEventListener('click', () => revealSlide('slideMissed'));
 
   })();
 </script>
