@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -663,9 +663,12 @@
     </div><!-- /.est-grid -->
 
     <!-- Back button sits below the cards -->
-    <div class="sum-footer">
-      <button id="backToMissed" class="backBtn">← Back</button>
-    </div>
+      <div class="sum-footer">
+        <button id="backToMissed"
+                class="backBtn"
+                style="padding: .9rem 1.2rem;">← Back</button>
+      </div>
+
 
   </div><!-- /.slide-content.estimation -->
 
