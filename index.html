@@ -483,22 +483,40 @@
     <h1>CHIIRP DEMO</h1>
     <h2>SEE YOUR SAVINGS WITH CHIIRP</h2>
 
-    <div class="input-row">
-      <!-- Form submissions -->
-      <input id="leads"       type="number" step="1"    placeholder="Monthly form submissions">
-      <input id="formWins"    type="number" step="1"    placeholder="# Closed-from-forms wins ">
-    
-      <!-- Missed calls -->
-      <input id="missedCalls" type="number" step="1"    placeholder="Monthly missed calls">
-      <input id="missedWins"  type="number" step="1"    placeholder="# Closed-from-missed calls wins">
-    
-      <!-- Estimates / quotes -->
-      <input id="quotes"      type="number" step="1"    placeholder="Monthly quotes sent">
-      <input id="quoteWins"   type="number" step="1"    placeholder="# Closed-from-quotes wins">
-    
-      <!-- Revenue -->
-      <input id="avgRev"      type="number" step="0.01" placeholder="Avg revenue per sale ($)">
-    </div>
+      <div class="input-row">
+        <!-- Form submissions -->
+        <input id="leads"       type="number" step="1"    min="0"
+               placeholder="Form submissions per month"
+               aria-label="Monthly number of form submissions">
+      
+        <input id="formWins"    type="number" step="1"    min="0"
+               placeholder="Closed from forms"
+               aria-label="Closed deals that came from form submissions per month">
+      
+        <!-- Missed calls -->
+        <input id="missedCalls" type="number" step="1"    min="0"
+               placeholder="Missed calls per month"
+               aria-label="Monthly number of missed or abandoned calls">
+      
+        <input id="missedWins"  type="number" step="1"    min="0"
+               placeholder="Closed from missed calls"
+               aria-label="Closed deals that started as missed calls per month">
+      
+        <!-- Estimates / quotes -->
+        <input id="quotes"      type="number" step="1"    min="0"
+               placeholder="Quotes sent per month"
+               aria-label="Monthly number of quotes or estimates sent">
+      
+        <input id="quoteWins"   type="number" step="1"    min="0"
+               placeholder="Closed from quotes"
+               aria-label="Closed deals that came from quotes per month">
+      
+        <!-- Revenue -->
+        <input id="avgRev"      type="number" step="0.01" min="0"
+               placeholder="Avg revenue per sale ($)"
+               aria-label="Average revenue per closed sale in dollars">
+      </div>
+      
 
     <!-- Fixed plan cost for ROI -->
     <input type="hidden" name="plan" value="1250">
