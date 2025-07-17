@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -460,6 +460,17 @@
   padding-right:1rem;
 }
 
+/* summary Back button spacing + tighter width */
+#slideSum .sum-footer{
+  margin-top:1rem;              /* was 2.5rem */
+  display:flex;
+  justify-content:center;
+}
+
+#slideSum .sum-footer .backBtn{
+  margin-top:0;                 /* kill global 2rem margin-top */
+  padding:.9rem 1.2rem;         /* narrower than global 1.8rem */
+}
 
 
 </style>
@@ -668,11 +679,10 @@
     </div><!-- /.est-grid -->
 
     <!-- Back button sits below the cards -->
-      <div class="sum-footer">
-        <button id="backToMissed"
-                class="backBtn"
-                style="padding: .9rem 1.2rem;">← Back</button>
-      </div>
+    <div class="sum-footer">
+      <button id="backToMissed" class="backBtn">← Back</button>
+    </div>
+
 
 
   </div><!-- /.slide-content.estimation -->
