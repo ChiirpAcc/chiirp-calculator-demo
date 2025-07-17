@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -454,6 +454,11 @@
   }
 }
 
+/* LAST rule in the stylesheet ─ tighten the Back button on slide 5 only */
+#slideSum .sum-footer #backToMissed{
+  padding-left:1rem;     /* was 1.8rem */
+  padding-right:1rem;
+}
 
 
 
@@ -635,9 +640,9 @@
     <div class="est-grid">
       <!-- LEFT CARD – monthly breakdown -->
       <div class="est-card details-table">
-        <h1>Breakdown by Module</h1>
+        <h1>Breakdown by Campaign</h1>
         <table>
-          <thead><tr><th>Module</th><th>Monthly Gain</th></tr></thead>
+          <thead><tr><th>Campaign</th><th>Monthly Gain</th></tr></thead>
           <tbody id="sumValues"></tbody>
         </table>
       </div>
