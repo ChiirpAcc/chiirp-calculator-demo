@@ -761,8 +761,8 @@
 
     const lowWins = Math.max(baselineLow, current);
 
-    // if user is already beating our high case, bump by 5 %
-    let highWins = current > baselineHigh ? current * 1.05 : baselineHigh;
+    // if user is already beating our high case, bump by 5.298 %
+    let highWins = current > baselineHigh ? current * 1.05298 : baselineHigh;
     if (highWins < lowWins) highWins = lowWins;      // guard
 
     return {
