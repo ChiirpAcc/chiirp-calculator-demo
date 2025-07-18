@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #0693e3 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -719,60 +719,78 @@
 
 
 <script>
-(function(){
+(function () {
   const g = id => document.getElementById(id);
+
+  // revenue buckets per campaign
   let revLowEst = 0, revHighEst = 0;
   let revLowS2L = 0, revHighS2L = 0;
   let revLowMiss = 0, revHighMiss = 0;
 
-  function revealSlide(id){
+  /* UI helpers */
+  function revealSlide(id) {
     document.querySelectorAll('.slide').forEach(s => s.style.display = 'none');
     const el = g(id);
     el.style.display = 'block';
     requestAnimationFrame(() => el.style.opacity = 1);
   }
 
-  /* helpers -------------------------------------------------------------- */
-  function fmtMoney(n){
-    return n.toLocaleString('en-US',{maximumFractionDigits:0});
+  function fmtMoney(n) {
+    return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
   }
-  // “$lo – $hi”  unless low ≤ 0  →  “Up to $hi”
-  function fmtRange(lo,hi){
-    const low  = Math.round(lo);
+  function fmtRange(lo, hi) {
+    const low = Math.round(lo);
     const high = Math.round(hi);
     return low <= 0
       ? `Up to $${fmtMoney(high)}`
       : `$${fmtMoney(low)} – $${fmtMoney(high)}`;
   }
-  // ROI formatter: if low ≤ 0 show "Up to H×" else "L× – H×"
-  function fmtROI(lo,hi){
-    const l = Number(lo)||0;
-    const h = Number(hi)||0;
-    const fmt = n => Number(n).toFixed(1);
+  function fmtROI(lo, hi) {
+    const l = Number(lo) || 0;
+    const h = Number(hi) || 0;
+    const f = x => Number(x).toFixed(1);
     return l <= 1
-      ? `Up to ${fmt(h)}×`
-      : `${fmt(l)}× – ${fmt(h)}×`;
+      ? `Up to ${f(h)}×`
+      : `${f(l)}× – ${f(h)}×`;
   }
-  /* --------------------------------------------------------------------- */
 
-  /* ────────── 1) Inputs → Estimation ────────── */
+  /* core calculator */
+  function calcRange({ current, pool, lowPct, highPct, avgRev }) {
+    const baselineLow = pool * lowPct;
+    const baselineHigh = pool * highPct;
+
+    const lowWins = Math.max(baselineLow, current);
+
+    // if user is already beating our high case, bump by 5 %
+    let highWins = current > baselineHigh ? current * 1.05 : baselineHigh;
+    if (highWins < lowWins) highWins = lowWins;      // guard
+
+    return {
+      lowWins,
+      highWins,
+      revLow:  (lowWins  - current) * avgRev,
+      revHigh: (highWins - current) * avgRev
+    };
+  }
+
+  /* 1) Inputs → Estimate Follow-Up */
   g('calcBtn').addEventListener('click', () => {
-    const Q  = +g('quotes').value;
+    const Q = +g('quotes').value;
     const W3 = +g('quoteWins').value;
     const AR = +g('avgRev').value;
 
-    const lowWins  = Math.max(Q * 0.10, W3);
-    const highWins = Math.max(Q * 0.20, W3);
-
-    revLowEst  = (lowWins  - W3) * AR;
-    revHighEst = (highWins - W3) * AR;
+    const { lowWins, highWins, revLow, revHigh } = calcRange({
+      current: W3, pool: Q, lowPct: 0.10, highPct: 0.20, avgRev: AR
+    });
+    revLowEst = revLow;
+    revHighEst = revHigh;
 
     g('estValues').innerHTML = [
-      ['Quotes / mo',        Q],
+      ['Quotes / mo',        Q],
       ['Chiirp wins (low)',  lowWins.toFixed(1)],
       ['Chiirp wins (high)', highWins.toFixed(1)],
       ['Monthly gain',       fmtRange(revLowEst, revHighEst)]
-    ].map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+    ].map(([l, v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
 
     g('estGainMonthly').textContent = fmtRange(revLowEst, revHighEst);
     g('estGainAnnual').textContent  = fmtRange(revLowEst * 12, revHighEst * 12);
@@ -780,24 +798,24 @@
     revealSlide('slideEst');
   });
 
-  /* ────────── 2) Estimation → Speed-to-Lead ────────── */
+  /* 2) Estimate → Speed-to-Lead */
   g('toS2L').addEventListener('click', () => {
-    const F  = +g('leads').value;
+    const F = +g('leads').value;
     const W1 = +g('formWins').value;
     const AR = +g('avgRev').value;
 
-    const lowWins  = Math.max(F * 0.15, W1);
-    const highWins = Math.max(F * 0.35, W1);
-
-    revLowS2L  = (lowWins  - W1) * AR;
-    revHighS2L = (highWins - W1) * AR;
+    const { lowWins, highWins, revLow, revHigh } = calcRange({
+      current: W1, pool: F, lowPct: 0.15, highPct: 0.35, avgRev: AR
+    });
+    revLowS2L = revLow;
+    revHighS2L = revHigh;
 
     g('s2lValues').innerHTML = [
-      ['Form submissions / mo', F],
+      ['Form submissions / mo', F],
       ['With Chiirp (low)',     lowWins.toFixed(1)],
       ['With Chiirp (high)',    highWins.toFixed(1)],
       ['Monthly gain',          fmtRange(revLowS2L, revHighS2L)]
-    ].map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+    ].map(([l, v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
 
     g('s2lGainMonthly').textContent = fmtRange(revLowS2L, revHighS2L);
     g('s2lGainAnnual').textContent  = fmtRange(revLowS2L * 12, revHighS2L * 12);
@@ -805,24 +823,24 @@
     revealSlide('slideS2L');
   });
 
-  /* ────────── 3) Speed-to-Lead → Abandoned-Call ────────── */
+  /* 3) Speed-to-Lead → Abandoned-Call Recovery */
   g('toMissed').addEventListener('click', () => {
-    const M  = +g('missedCalls').value;
+    const M = +g('missedCalls').value;
     const W2 = +g('missedWins').value || 0;
     const AR = +g('avgRev').value;
 
-    const lowWins  = Math.max(M * 0.20, W2);
-    const highWins = Math.max(M * 0.35, W2);
-
-    revLowMiss  = (lowWins  - W2) * AR;
-    revHighMiss = (highWins - W2) * AR;
+    const { lowWins, highWins, revLow, revHigh } = calcRange({
+      current: W2, pool: M, lowPct: 0.20, highPct: 0.35, avgRev: AR
+    });
+    revLowMiss = revLow;
+    revHighMiss = revHigh;
 
     g('missValues').innerHTML = [
-      ['Abandoned calls / mo', M],
+      ['Abandoned calls / mo', M],
       ['With Chiirp (low)',    lowWins.toFixed(1)],
       ['With Chiirp (high)',   highWins.toFixed(1)],
       ['Monthly gain',         fmtRange(revLowMiss, revHighMiss)]
-    ].map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+    ].map(([l, v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
 
     g('missGainMonthly').textContent = fmtRange(revLowMiss, revHighMiss);
     g('missGainAnnual').textContent  = fmtRange(revLowMiss * 12, revHighMiss * 12);
@@ -830,38 +848,37 @@
     revealSlide('slideMissed');
   });
 
-  /* ────────── 4) Abandoned-Call → Summary ────────── */
+  /* 4) Abandoned-Call → Summary */
   g('toSum').addEventListener('click', () => {
     const monthlyCost = +document.querySelector('input[name="plan"]').value || 0;
 
     const lowTotal  = revLowEst  + revLowS2L  + revLowMiss;
     const highTotal = revHighEst + revHighS2L + revHighMiss;
 
-    // guard divide
-    const roiLow  = monthlyCost > 0 ? (lowTotal  / monthlyCost) : 0;
-    const roiHigh = monthlyCost > 0 ? (highTotal / monthlyCost) : 0;
+    const roiLow  = monthlyCost > 0 ? lowTotal  / monthlyCost : 0;
+    const roiHigh = monthlyCost > 0 ? highTotal / monthlyCost : 0;
 
     g('sumValues').innerHTML = [
       ['Estimation Follow-Up', fmtRange(revLowEst,  revHighEst)],
       ['Speed-to-Lead',        fmtRange(revLowS2L,  revHighS2L)],
       ['Call Recovery',        fmtRange(revLowMiss, revHighMiss)]
-    ].map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+    ].map(([l, v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
 
-    g('sumGainMonthly').textContent = fmtRange(lowTotal,   highTotal);
-    g('sumGainAnnual').textContent  = fmtRange(lowTotal*12, highTotal*12);
+    g('sumGainMonthly').textContent = fmtRange(lowTotal, highTotal);
+    g('sumGainAnnual').textContent  = fmtRange(lowTotal * 12, highTotal * 12);
     g('sumROI').textContent         = fmtROI(roiLow, roiHigh);
 
     revealSlide('slideSum');
   });
 
-  /* ────────── Back buttons ────────── */
+  /* back navigation */
   g('backToInputs').addEventListener('click', () => revealSlide('slideInputs'));
   g('backToEst').addEventListener('click',    () => revealSlide('slideEst'));
   g('backToS2L').addEventListener('click',    () => revealSlide('slideS2L'));
   g('backToMissed').addEventListener('click', () => revealSlide('slideMissed'));
-
 })();
 </script>
+
 
 
 </body>
