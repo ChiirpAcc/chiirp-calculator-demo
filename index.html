@@ -5,122 +5,480 @@
   <title>CHIIRP Demo – Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/*──────────────── 1 ▸ GLOBAL FOUNDATION ────────────────*/
-html,body{margin:0;padding:0}
-body{
-  min-height:100vh;display:flex;justify-content:center;align-items:center;
-  font-family:system-ui,sans-serif;color:#fff;overflow-x:hidden;position:relative}
-body::before{               /* slow‑spinning gradient backdrop */
-  content:"";position:fixed;top:50%;left:50%;z-index:-1;
-  width:calc(100vw + 100vh);height:calc(100vw + 100vh);
-  background:linear-gradient(130deg,#fcb900 0%,#000 100%);
-  transform:translate(-50%,-50%) rotate(0deg);
-  animation:spin 20s linear infinite}
-@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-
-/* wrapper that centres the card */
-.slide{position:absolute;inset:0;display:grid;place-items:center;
-  padding:2rem;text-align:center}
-
-/* base card shell */
-.slide-content.inputs,
-.slide .slide-content.estimation{
-  background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
-  border-radius:12px;box-shadow:0 8px 24px #0003;
-  max-height:100dvh;overflow-y:auto;overscroll-behavior:contain}
-
-/*──────────────── 2 ▸ INPUT SLIDE (unchanged) ──────────*/
-.slide-content.inputs{padding:2rem;max-width:600px;width:100%}
-.slide-content.inputs h1{margin:.5rem 0;font-size:clamp(2.4rem,6vw,4rem)}
-.slide-content.inputs h2{margin:0 0 1.5rem;font-size:clamp(1.2rem,3vw,1.6rem);font-weight:300}
-
-.input-row{margin-top:2.3rem;display:flex;flex-wrap:wrap;gap:1rem}
-.input-row input{flex:1 1 180px;padding:.9rem;border:none;border-radius:6px;text-align:center}
-
-.plan-selector{display:flex;gap:2rem;justify-content:center;margin-top:1.5rem;padding:.75rem 1rem;
-  background:rgba(255,255,255,.08);border:1px solid #ffffff4d;border-radius:8px}
-.plan-selector label{padding:.5rem 1rem;color:#fff;border-radius:6px;cursor:pointer;transition:.2s}
-.plan-selector label:hover{background:rgba(255,255,255,.2)}
-.plan-selector input:checked+span{font-weight:700;text-decoration:underline}
-
-/*──────────────── 3 ▸ RESULT SLIDES – DESKTOP (≥641 px) ─*/
-.slide .slide-content.estimation{padding:2rem 2rem 5rem;display:grid;place-items:center;position:relative}
-.est-grid{display:grid;grid-template-columns:360px minmax(auto,1fr);gap:5rem;align-items:start}
-
-.est-card{background:rgba(255,255,255,.08);border-radius:8px;padding:1.5rem;display:flex;flex-direction:column}
-
-.details-table h1{margin-bottom:.6rem}
-.details-table .subhead{margin-bottom:1.3rem}
-.details-table table{width:100%;border-collapse:collapse;margin-bottom:1.3rem}
-.details-table th,.details-table td{padding:.6rem .8rem;border-bottom:1px solid #ffffff33;text-align:left}
-
-.highlight-table{align-items:center;text-align:center}
-.highlight-grid{display:flex;flex-direction:column;align-items:center;gap:3rem;margin-bottom:3rem;width:100%}
-.highlight-number{font-size:clamp(3.2rem,7vw,5rem);white-space:nowrap;line-height:1.05;
-  color:#ffeb3b;font-weight:700;text-shadow:0 2px 6px #0006}
-.highlight-pair{display:flex;flex-direction:column;align-items:center;gap:.35rem}
-.subtext{font-size:1rem;letter-spacing:.05rem;text-transform:uppercase;margin:0}
-
-.highlight-footer{display:flex;gap:1rem;justify-content:center;width:100%}
-
-button{margin-top:2rem;padding:.9rem 1.8rem;font-size:1rem;border:none;border-radius:6px;
-  cursor:pointer;background:#ffb703;color:#002844;font-weight:700;transition:opacity .25s}
-button:disabled{opacity:.4}
-.restartBtn{position:fixed;bottom:2rem;right:2rem;z-index:1000}
-
-#sumMonthlyPair{display:none}
-#slideSum .highlight-grid{grid-template-rows:auto auto}
-#slideSum .sum-footer{margin-top:1rem;display:flex;justify-content:center}
-#slideSum .sum-footer .backBtn{padding:.9rem 1.2rem}
-
-/*──────────────── 4 ▸ RESULT SLIDES – MOBILE (≤640 px) ─*/
-@media (max-width:640px){
-  .slide .slide-content.estimation{
-    padding:1.25rem;display:flex;flex-direction:column;max-width:480px;width:100%}
-
-  /* stack:   title  •  highlight  •  buttons   */
-  .est-grid{display:flex;flex-direction:column;gap:1.25rem}
-
-  /* show only title line from the old “left” pane */
-  .details-table{background:transparent;padding:0;margin:0}
-  .details-table .subhead,.details-table table{display:none}
-  .details-table h1{font-size:clamp(1.4rem,6vw,1.8rem);margin:0}
-
-  /* highlight block uses full width */
-  .highlight-table{background:rgba(255,255,255,.08);padding:1.25rem;border-radius:8px;
-    align-items:flex-start;text-align:left}
-  .highlight-grid{gap:1.4rem;margin:0 0 1.2rem}
-  .highlight-number{font-size:clamp(2.4rem,8vw,3rem);white-space:normal}
-
-  /* buttons always locked to bottom of card */
-  .highlight-footer{margin-top:auto}
-  .highlight-footer button,
-  #slideSum .sum-footer button{flex:1 1 48%}
+/* ────────── SLIDE 1 “CARD” LAYOUT ────────── */
+  .slide-content.inputs {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
+    margin: auto;
+  }
+  .slide-content.inputs h1 {
+    margin-bottom: 0.5rem;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+  }
+  .slide-content.inputs h2 {
+    margin-bottom: 1.5rem;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 300;
+  }
+  .slide-content.inputs .guide {
+    margin-top: 1.5rem;
+    background: rgba(255,255,255,0.08);
+    padding: 1rem;
+    border-radius: 8px;
+  }
+/* ────────── SLIDE 1 – PLAN SELECTOR ONLY ────────── */
+.slide-content.inputs .plan-selector {
+  grid-column: 1 / -1;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
 }
 
-/* gutters for ultra‑narrow phones */
-@media (max-width:400px){
-  .slide-content.inputs,
-  .slide .slide-content.estimation{margin-inline:1rem}
+.slide-content.inputs .plan-selector label {
+  position: relative;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #fff;
+  border-radius: 6px;
+  transition: background 0.2s, font-weight 0.2s, text-decoration 0.2s;
 }
 
-/* height‑based tweaks to avoid scroll on short screens */
-@media (max-height:800px){
-  .highlight-number{font-size:clamp(2.6rem,7vw,3rem)}
-  .highlight-grid{gap:1rem}}
-@media (max-height:700px){
-  .highlight-number{font-size:clamp(2.3rem,7vw,2.7rem)}}
+/* remove the semi-opaque highlight box */
+.slide-content.inputs .plan-selector label::before {
+  display: none;
+}
 
-/*──────────────── 5 ▸ UTILITIES ─────────────────────────*/
-.valItem{opacity:0;transform:translateX(-60px);transition:.6s ease}
-.valItem.show{opacity:1;transform:translateX(0)}
-input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{display:none}
+/* hover tint only */
+.slide-content.inputs .plan-selector label:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* checked → bold + underline (no color change) */
+.slide-content.inputs .plan-selector input:checked + span {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+
+
+/* ────────── ESTIMATION SLIDE LAYOUT ────────── */
+
+/* ─── 1) Center the card ─── */
+.slide {
+  display: grid;
+  place-items: center;
+}
+
+/* 2) Shrink-wrap the outer card ─── add position:relative */
+.slide .slide-content.estimation {
+  position: relative;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  /* width: max-content; */    /* ← remove this so the card can grow/shrink fluidly */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  margin: 0;
+  padding-bottom: 6rem;
+}
+
+/* tighten the bottom edge on the Summary slide only */
+#slideSum .slide-content.estimation {
+  padding-bottom: 2rem;   /* or any value you prefer */
+}
+
+/* 3) Two-column inner grid with generous gutter */
+.slide .slide-content.estimation .est-grid {
+  display: grid;
+  grid-template-columns: 360px minmax(auto, 1fr);
+  gap: 5rem;
+  margin: 0;
+  align-items: stretch;
+}
+
+
+/* ─── 4) Common card styles ─── */
+.slide .slide-content.estimation .est-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── 5) Left-column “details-table” ─── */
+.slide .slide-content.estimation .details-table {
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+}
+.slide .slide-content.estimation .details-table h1 {
+  margin-bottom: 0.5rem;      /* match Follow-Up slide */
+}
+.slide .slide-content.estimation .details-table .subhead {
+  margin-bottom: 1.5rem;      /* space under the subtitle */
+}
+.slide .slide-content.estimation .details-table table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+  margin-bottom: 1.5rem;      /* space under the table */
+}
+.slide .slide-content.estimation .details-table th,
+.slide .slide-content.estimation .details-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  text-align: left;
+}
+.slide .slide-content.estimation .details-table details.calc-formula {
+  margin-top: 0;              /* snug under the table */
+}
+.slide .slide-content.estimation .details-table details.calc-formula summary {
+  margin-bottom: 0.5rem;      /* tighten summary spacing */
+}
+
+/* ─── 6) Right-column “highlight-table” ─── */
+.slide .slide-content.estimation .highlight-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;        /* keep heading centred */
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* vertical stack for value blocks */
+.slide .slide-content.estimation .highlight-grid {
+  display: flex;              /* replaces 2-row grid  */
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;                  /* space between Monthly ↔ Annual */
+  width: 100%;
+  flex: 1 0 auto;             /* still pushes footer down */
+}
+
+/* label + number pair */
+.slide .slide-content.estimation .highlight-pair {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;                 /* label ↔ number */
+}
+.slide .slide-content.estimation .highlight-pair p { margin: 0; }
+
+/* big yellow numbers – one line, bolded with shadow */
+.slide .slide-content.estimation .highlight-number {
+  font-size: clamp(3.2rem, 7vw, 5rem);
+  white-space: nowrap;           /* keep range on one line */
+  line-height: 1.05;
+  color: #ffeb3b;                /* yellow */
+  font-weight: 700;              /* bold */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);  /* slight shadow */
+}
+
+
+/* uppercase labels */
+.slide .slide-content.estimation .subtext {
+  font-size: 1rem;
+  letter-spacing: .05rem;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* hide ROI block on non-summary slides (keep it on #slideSum) */
+.slide:not(#slideSum) #sumROIPair,
+.slide:not(#slideSum) #sumROI { display: none; }
+  
+/* 7) Footer buttons – absolute, two-button row */
+.slide .slide-content.estimation .highlight-footer {
+  position: absolute;
+  bottom: 1.5rem;          /* adjust if you prefer */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;           /* row layout */
+  gap: 1rem;               /* space between Back and Next */
+  justify-content: center; /* keep centred as a group */
+  width: auto;
+  pointer-events: auto;
+  margin-top: 0;
+  text-align: center;      /* harmless with flex */
+}
+
+/* 8) Responsive: stack content, give each button 50 % width */
+@media (max-width: 640px) {
+  .slide .slide-content.estimation .est-grid {
+    grid-template-columns: 1fr;
+  }
+  .slide .slide-content.estimation .est-card {
+    margin-bottom: 2rem;
+  }
+  .slide .slide-content.estimation .highlight-footer button {
+    flex: 1 1 50%;         /* each button fills half the row */
+  }
+}
+
+
+
+  
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     BODY & ROTATING BACKDROP
+  ───────────────────────────────────────────────────────────────────────────── */
+  body {
+    position: relative;      /* for the pseudo-element */
+    overflow: hidden;
+    font-family: system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;      /* no horizontal scroll */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 50%; left: 50%;
+    /* make it exactly big enough so its diagonal ≥ viewport diagonal */
+    width:  calc(100vw + 100vh);
+    height: calc(100vw + 100vh);
+    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    transform: translate(-50%, -50%) rotate(0deg);
+    transform-origin: center center;
+    z-index: -1;
+    animation: spin-bg 20s linear infinite;
+  }
+  @keyframes spin-bg {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     SLIDE WRAPPER
+  ───────────────────────────────────────────────────────────────────────────── */
+  .slide {
+    width: min(94vw, 1300vw);
+    text-align: center;
+    padding: 2rem;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     HEADINGS
+  ───────────────────────────────────────────────────────────────────────────── */
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    letter-spacing: 2px;
+    text-shadow: 0 2px 6px #0006;
+  }
+  h2 {
+    margin-top: .8rem;
+    font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+    font-weight: 400;
+    letter-spacing: .2rem;
+  }
+  h5{
+    font-size:clamp(4.4rem,10vw,7.2rem); /* 2x each original bound */
+    letter-spacing:2px;
+    text-shadow:0 2px 6px #0006;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     INPUT ROW
+  ───────────────────────────────────────────────────────────────────────────── */
+  .input-row {
+    margin-top: 2.3rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .input-row input {
+    flex: 1 1 180px;
+    padding: .9rem;
+    border: none;
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     BUTTONS
+  ───────────────────────────────────────────────────────────────────────────── */
+  button {
+    margin-top: 2rem;
+    padding: .9rem 1.8rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #ffb703;
+    color: #002844;
+    font-weight: 700;
+    transition: opacity .25s;
+  }
+  button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     RESULT ITEMS ANIMATION
+  ───────────────────────────────────────────────────────────────────────────── */
+  .valItem {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: transform .6s ease, opacity .6s ease;
+  }
+  .valItem.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     GUIDE PANEL
+  ───────────────────────────────────────────────────────────────────────────── */
+  .guide {
+    margin-top: 2.5rem;
+    width: 100%;
+    background: rgba(255,255,255,.12);
+    border-radius: 10px;
+    padding: 1.4rem 1.2rem;
+    backdrop-filter: blur(6px);
+  }
+  .guide h3 {
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+    letter-spacing: .08rem;
+  }
+  .guide table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+  .guide th, .guide td {
+    padding: .45rem .55rem;
+    text-align: left;
+  }
+  .guide th {
+    border-bottom: 1px solid #ffffff55;
+    font-weight: 600;
+  }
+  .guide td:first-child {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     HIDE NUMBER-INPUT SPINNERS
+  ───────────────────────────────────────────────────────────────────────────── */
+  input::-webkit-inner-spin-button,
+  input::-webkit-outer-spin-button {
+    display: none;
+  }
+
+/* SUMMARY slide — remove the monthly row entirely */
+#sumMonthlyPair { display: none; }
+
+/* Re-flow the remaining two rows */
+#slideSum .highlight-grid {
+  grid-template-rows: auto auto;  /* annual + ROI */
+}
+
+/* ───── Right-pane polish (add AFTER existing rules) ───────────────────────── */
+
+/* 0 ▸ let long ranges wrap instead of overflowing the card */
+.slide .slide-content.estimation .highlight-table{
+  white-space: normal;               /* was -nowrap                       */
+}
+
+/* 1 ▸ number + label stack, flush-left inside each pair */
+.slide .slide-content.estimation .highlight-pair{
+  align-items:flex-start;            /* $ aligns at same left edge        */
+  text-align:left;
+  gap:.25rem;
+}
+
+/* 2 ▸ big yellow numbers – one line, bold with shadow */
+.slide .slide-content.estimation .highlight-number {
+  font-size: clamp(3.2rem, 7vw, 5rem);
+  white-space: nowrap;           /* keep the full range on one line */
+  line-height: 1.05;
+  color: #ffeb3b;                /* yellow */
+  font-weight: 700;              /* bold */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);  /* slight drop shadow */
+}
+
+
+/* 3 ▸ MONTHLY / ANNUAL label */
+.slide .slide-content.estimation .subtext{
+  font-size:.9rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.04rem;
+  color:rgba(255,255,255,.7);        /* 70 % opacity                      */
+  margin:0;
+  padding-left:.25rem;               /* tiny indent so it clears the “$”  */
+}
+
+/* slideSum is positioning context */
+#slideSum{ position:relative; }
+
+/* Back button row */
+#slideSum .sum-footer{
+  margin-top:2.5rem;
+  display:flex;
+  justify-content:center;
+}
+
+/* tighter padding only for this Back button */
+#slideSum .backBtn{
+  padding-left:1.2rem;
+  padding-right:1.2rem;
+}
+
+/* Restart button fixed bottom-right */
+.restartBtn{
+  position:fixed;
+  bottom:2rem;
+  right:2rem;
+  z-index:1000;
+}
+
+/* mobile tweaks */
+@media(max-width:640px){
+  #slideSum .sum-footer button{ flex:1 1 50%; }
+  .restartBtn{
+    bottom:1.2rem;
+    right:1.2rem;
+    padding:.7rem 1.4rem;
+  }
+}
+
+/* LAST rule in the stylesheet ─ tighten the Back button on slide 5 only */
+#slideSum .sum-footer #backToMissed{
+  padding-left:1rem;     /* was 1.8rem */
+  padding-right:1rem;
+}
+
+/* summary Back button spacing + tighter width */
+#slideSum .sum-footer{
+  margin-top:1rem;              /* was 2.5rem */
+  display:flex;
+  justify-content:center;
+}
+
+#slideSum .sum-footer .backBtn{
+  margin-top:0;                 /* kill global 2rem margin-top */
+  padding:.9rem 1.2rem;         /* narrower than global 1.8rem */
+}
+
+
 </style>
-
-
-
-
-
 
 </head>
 <body>
