@@ -160,13 +160,15 @@
 
 /* vertical stack for value blocks */
 .slide .slide-content.estimation .highlight-grid {
-  display: flex;              /* replaces 2-row grid  */
+  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3rem;                  /* space between Monthly ↔ Annual */
+  gap: 2rem;
   width: 100%;
-  flex: 1 0 auto;             /* still pushes footer down */
+  flex: 1 0 auto;
+  margin-bottom: 3rem; /* add breathing room for buttons */
 }
+
 
 /* label + number pair */
 .slide .slide-content.estimation .highlight-pair {
@@ -225,12 +227,25 @@
     width: 100%;
   }
   .slide .slide-content.estimation .est-card {
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
   }
-  .slide .slide-content.estimation .highlight-footer button {
-    flex: 1 1 50%;
+  .slide .slide-content.estimation .highlight-footer {
+    position: relative;  /* changed from absolute */
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+
+}
+  @media (max-width: 480px){
+  .slide .slide-content.estimation .est-card {
+    width: 100%;
   }
 }
+
 /* phones ≤375 px get side‑gutters so the card isn’t glued to the edge */
 @media (max-width: 400px){
   .slide-content.inputs,
@@ -262,6 +277,9 @@
     flex: 1 1 100%;
     width: 100%;
   }
+    .highlight-number {
+    white-space: nowrap;
+  }
 }
 
 
@@ -282,6 +300,7 @@
 @media (max-width: 360px){
   .highlight-number{
     font-size:clamp(2.1rem, 8.5vw, 2.8rem);
+    white-space: nowrap;
   }
 }
 
@@ -308,7 +327,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
