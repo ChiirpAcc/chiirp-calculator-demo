@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #fcb900 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -778,6 +778,13 @@
     const Q = +g('quotes').value;
     const W3 = +g('quoteWins').value;
     const AR = +g('avgRev').value;
+// === skip Follow‑Up slide when both quote inputs are blank ===
+if (!Q && !W3) {
+  revLowEst = revHighEst = 0;
+  revealSlide('slideS2L');
+  return;
+}
+// === end skip block ===
 
     const { lowWins, highWins, revLow, revHigh } = calcRange({
       current: W3, pool: Q, lowPct: 0.10, highPct: 0.20, avgRev: AR
@@ -803,6 +810,13 @@
     const F = +g('leads').value;
     const W1 = +g('formWins').value;
     const AR = +g('avgRev').value;
+// === skip Speed‑to‑Lead slide when both form inputs are blank ===
+if (!F && !W1) {
+  revLowS2L = revHighS2L = 0;
+  revealSlide('slideMissed');
+  return;
+}
+// === end skip block ===
 
     const { lowWins, highWins, revLow, revHigh } = calcRange({
       current: W1, pool: F, lowPct: 0.15, highPct: 0.35, avgRev: AR
@@ -828,6 +842,31 @@
     const M = +g('missedCalls').value;
     const W2 = +g('missedWins').value || 0;
     const AR = +g('avgRev').value;
+// === skip Missed‑Call Recovery when both missed‑call inputs are blank ===
+if (!M && !W2) {
+  revLowMiss = revHighMiss = 0;
+
+  /* build summary immediately */
+  const monthlyCost = +document.querySelector('input[name="plan"]').value || 0;
+  const lowTotal  = revLowEst  + revLowS2L  + revLowMiss;
+  const highTotal = revHighEst + revHighS2L + revHighMiss;
+  const roiLow  = monthlyCost ? lowTotal  / monthlyCost : 0;
+  const roiHigh = monthlyCost ? highTotal / monthlyCost : 0;
+
+  const rows = [
+    revLowEst || revHighEst ? ['Estimation Follow‑Up', fmtRange(revLowEst, revHighEst)] : null,
+    revLowS2L || revHighS2L ? ['Speed‑to‑Lead',        fmtRange(revLowS2L, revHighS2L)] : null
+  ].filter(Boolean);
+
+  g('sumValues').innerHTML   = rows.map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+  g('sumGainMonthly').textContent = fmtRange(lowTotal, highTotal);
+  g('sumGainAnnual').textContent  = fmtRange(lowTotal * 12, highTotal * 12);
+  g('sumROI').textContent         = fmtROI(roiLow, roiHigh);
+
+  revealSlide('slideSum');
+  return;
+}
+// === end skip block ===
 
     const { lowWins, highWins, revLow, revHigh } = calcRange({
       current: W2, pool: M, lowPct: 0.20, highPct: 0.35, avgRev: AR
@@ -858,18 +897,33 @@
     const roiLow  = monthlyCost > 0 ? lowTotal  / monthlyCost : 0;
     const roiHigh = monthlyCost > 0 ? highTotal / monthlyCost : 0;
 
-    g('sumValues').innerHTML = [
-      ['Estimation Follow-Up', fmtRange(revLowEst,  revHighEst)],
-      ['Speed-to-Lead',        fmtRange(revLowS2L,  revHighS2L)],
-      ['Call Recovery',        fmtRange(revLowMiss, revHighMiss)]
-    ].map(([l, v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+/* 4) Abandoned‑Call → Summary */
+g('toSum').addEventListener('click', () => {
+  const monthlyCost = +document.querySelector('input[name="plan"]').value || 0;
 
-    g('sumGainMonthly').textContent = fmtRange(lowTotal, highTotal);
-    g('sumGainAnnual').textContent  = fmtRange(lowTotal * 12, highTotal * 12);
-    g('sumROI').textContent         = fmtROI(roiLow, roiHigh);
+  const lowTotal  = revLowEst  + revLowS2L  + revLowMiss;
+  const highTotal = revHighEst + revHighS2L + revHighMiss;
 
-    revealSlide('slideSum');
-  });
+  const roiLow  = monthlyCost > 0 ? lowTotal  / monthlyCost : 0;
+  const roiHigh = monthlyCost > 0 ? highTotal / monthlyCost : 0;
+
+  // build rows only for campaigns that have non‑zero gains
+  const rows = [
+    revLowEst  || revHighEst  ? ['Estimation Follow‑Up', fmtRange(revLowEst,  revHighEst)] : null,
+    revLowS2L  || revHighS2L  ? ['Speed‑to‑Lead',        fmtRange(revLowS2L,  revHighS2L)] : null,
+    revLowMiss || revHighMiss ? ['Call Recovery',        fmtRange(revLowMiss, revHighMiss)] : null
+  ].filter(Boolean);
+
+  g('sumValues').innerHTML = rows
+    .map(([l, v]) => `<tr><td>${l}</td><td>${v}</td></tr>`)
+    .join('');
+
+  g('sumGainMonthly').textContent = fmtRange(lowTotal, highTotal);
+  g('sumGainAnnual').textContent  = fmtRange(lowTotal * 12, highTotal * 12);
+  g('sumROI').textContent         = fmtROI(roiLow, roiHigh);
+
+  revealSlide('slideSum');
+});
 
   /* back navigation */
   g('backToInputs').addEventListener('click', () => revealSlide('slideInputs'));
