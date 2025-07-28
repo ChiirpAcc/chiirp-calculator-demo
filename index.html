@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -778,13 +778,36 @@
     const Q = +g('quotes').value;
     const W3 = +g('quoteWins').value;
     const AR = +g('avgRev').value;
-// === skip Follow‑Up slide when both quote inputs are blank ===
+// === skip Follow‑Up slide **and** pre‑compute Speed‑to‑Lead ===
 if (!Q && !W3) {
-  revLowEst = revHighEst = 0;
-  revealSlide('slideS2L');
+  revLowEst = revHighEst = 0;              // nothing from this campaign
+
+  /* — build Speed‑to‑Lead now — */
+  const F  = +g('leads').value;
+  const W1 = +g('formWins').value;
+  const AR = +g('avgRev').value;
+
+  const { lowWins, highWins, revLow, revHigh } = calcRange({
+    current: W1, pool: F, lowPct: 0.15, highPct: 0.35, avgRev: AR
+  });
+  revLowS2L = revLow;
+  revHighS2L = revHigh;
+
+  g('s2lValues').innerHTML = [
+    ['Form submissions / mo', F],
+    ['With Chiirp (low)',     lowWins.toFixed(1)],
+    ['With Chiirp (high)',    highWins.toFixed(1)],
+    ['Monthly gain',          fmtRange(revLowS2L, revHighS2L)]
+  ].map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+
+  g('s2lGainMonthly').textContent = fmtRange(revLowS2L, revHighS2L);
+  g('s2lGainAnnual').textContent  = fmtRange(revLowS2L * 12, revHighS2L * 12);
+
+  revealSlide('slideS2L');                // now populated
   return;
 }
-// === end skip block ===
+// === end enhanced skip block ===
+
 
     const { lowWins, highWins, revLow, revHigh } = calcRange({
       current: W3, pool: Q, lowPct: 0.10, highPct: 0.20, avgRev: AR
@@ -810,13 +833,36 @@ if (!Q && !W3) {
     const F = +g('leads').value;
     const W1 = +g('formWins').value;
     const AR = +g('avgRev').value;
-// === skip Speed‑to‑Lead slide when both form inputs are blank ===
+// === skip Speed‑to‑Lead **and** pre‑compute Missed‑Call Recovery ===
 if (!F && !W1) {
-  revLowS2L = revHighS2L = 0;
-  revealSlide('slideMissed');
+  revLowS2L = revHighS2L = 0;             // nothing from this campaign
+
+  /* — build Missed‑Call Recovery now — */
+  const M  = +g('missedCalls').value;
+  const W2 = +g('missedWins').value;
+  const AR = +g('avgRev').value;
+
+  const { lowWins, highWins, revLow, revHigh } = calcRange({
+    current: W2, pool: M, lowPct: 0.20, highPct: 0.35, avgRev: AR
+  });
+  revLowMiss = revLow;
+  revHighMiss = revHigh;
+
+  g('missValues').innerHTML = [
+    ['Abandoned calls / mo', M],
+    ['With Chiirp (low)',    lowWins.toFixed(1)],
+    ['With Chiirp (high)',   highWins.toFixed(1)],
+    ['Monthly gain',         fmtRange(revLowMiss, revHighMiss)]
+  ].map(([l,v]) => `<tr><td>${l}</td><td>${v}</td></tr>`).join('');
+
+  g('missGainMonthly').textContent = fmtRange(revLowMiss, revHighMiss);
+  g('missGainAnnual').textContent  = fmtRange(revLowMiss * 12, revHighMiss * 12);
+
+  revealSlide('slideMissed');             // now populated
   return;
 }
-// === end skip block ===
+// === end enhanced skip block ===
+
 
     const { lowWins, highWins, revLow, revHigh } = calcRange({
       current: W1, pool: F, lowPct: 0.15, highPct: 0.35, avgRev: AR
