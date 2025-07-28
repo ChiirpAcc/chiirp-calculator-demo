@@ -5,29 +5,31 @@
   <title>CHIIRP Demo – Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/*──────────────────── 1 • GLOBAL BASE ────────────────────*/
+/*──────────────── 1 ▸ GLOBAL FOUNDATION ────────────────*/
 html,body{margin:0;padding:0}
 body{
-  position:relative;min-height:100vh;
-  display:flex;justify-content:center;align-items:center;
-  font-family:system-ui,sans-serif;color:#fff;overflow-x:hidden}
-body::before{
-  content:"";position:fixed;top:50%;left:50%;
+  min-height:100vh;display:flex;justify-content:center;align-items:center;
+  font-family:system-ui,sans-serif;color:#fff;overflow-x:hidden;position:relative}
+body::before{               /* slow‑spinning gradient backdrop */
+  content:"";position:fixed;top:50%;left:50%;z-index:-1;
   width:calc(100vw + 100vh);height:calc(100vw + 100vh);
   background:linear-gradient(130deg,#fcb900 0%,#000 100%);
   transform:translate(-50%,-50%) rotate(0deg);
-  animation:spin-bg 20s linear infinite;z-index:-1}
-@keyframes spin-bg{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  animation:spin 20s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-.slide{position:absolute;inset:0;display:grid;place-items:center;padding:2rem;text-align:center}
+/* wrapper that centres the card */
+.slide{position:absolute;inset:0;display:grid;place-items:center;
+  padding:2rem;text-align:center}
 
+/* base card shell */
 .slide-content.inputs,
 .slide .slide-content.estimation{
   background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
   border-radius:12px;box-shadow:0 8px 24px #0003;
   max-height:100dvh;overflow-y:auto;overscroll-behavior:contain}
 
-/*──────────────────── 2 • INPUT SLIDE (unchanged) ────────────────────*/
+/*──────────────── 2 ▸ INPUT SLIDE (unchanged) ──────────*/
 .slide-content.inputs{padding:2rem;max-width:600px;width:100%}
 .slide-content.inputs h1{margin:.5rem 0;font-size:clamp(2.4rem,6vw,4rem)}
 .slide-content.inputs h2{margin:0 0 1.5rem;font-size:clamp(1.2rem,3vw,1.6rem);font-weight:300}
@@ -35,13 +37,14 @@ body::before{
 .input-row{margin-top:2.3rem;display:flex;flex-wrap:wrap;gap:1rem}
 .input-row input{flex:1 1 180px;padding:.9rem;border:none;border-radius:6px;text-align:center}
 
-.plan-selector{display:flex;gap:2rem;justify-content:center;margin-top:1.5rem;padding:.75rem 1rem;background:rgba(255,255,255,.08);border:1px solid #ffffff4d;border-radius:8px}
-.plan-selector label{padding:.5rem 1rem;cursor:pointer;color:#fff;border-radius:6px;transition:.2s}
+.plan-selector{display:flex;gap:2rem;justify-content:center;margin-top:1.5rem;padding:.75rem 1rem;
+  background:rgba(255,255,255,.08);border:1px solid #ffffff4d;border-radius:8px}
+.plan-selector label{padding:.5rem 1rem;color:#fff;border-radius:6px;cursor:pointer;transition:.2s}
 .plan-selector label:hover{background:rgba(255,255,255,.2)}
 .plan-selector input:checked+span{font-weight:700;text-decoration:underline}
 
-/*──────────────────── 3 • RESULT SLIDES — DESKTOP (≥641 px) ────────────────────*/
-.slide .slide-content.estimation{padding:2rem 2rem 5rem;position:relative;display:grid;place-items:center}
+/*──────────────── 3 ▸ RESULT SLIDES – DESKTOP (≥641 px) ─*/
+.slide .slide-content.estimation{padding:2rem 2rem 5rem;display:grid;place-items:center;position:relative}
 .est-grid{display:grid;grid-template-columns:360px minmax(auto,1fr);gap:5rem;align-items:start}
 
 .est-card{background:rgba(255,255,255,.08);border-radius:8px;padding:1.5rem;display:flex;flex-direction:column}
@@ -53,12 +56,15 @@ body::before{
 
 .highlight-table{align-items:center;text-align:center}
 .highlight-grid{display:flex;flex-direction:column;align-items:center;gap:3rem;margin-bottom:3rem;width:100%}
-.highlight-number{font-size:clamp(3.2rem,7vw,5rem);white-space:nowrap;line-height:1.05;color:#ffeb3b;font-weight:700;text-shadow:0 2px 6px #0006}
+.highlight-number{font-size:clamp(3.2rem,7vw,5rem);white-space:nowrap;line-height:1.05;
+  color:#ffeb3b;font-weight:700;text-shadow:0 2px 6px #0006}
 .highlight-pair{display:flex;flex-direction:column;align-items:center;gap:.35rem}
 .subtext{font-size:1rem;letter-spacing:.05rem;text-transform:uppercase;margin:0}
 
 .highlight-footer{display:flex;gap:1rem;justify-content:center;width:100%}
-button{margin-top:2rem;padding:.9rem 1.8rem;font-size:1rem;border:none;border-radius:6px;cursor:pointer;background:#ffb703;color:#002844;font-weight:700;transition:opacity .25s}
+
+button{margin-top:2rem;padding:.9rem 1.8rem;font-size:1rem;border:none;border-radius:6px;
+  cursor:pointer;background:#ffb703;color:#002844;font-weight:700;transition:opacity .25s}
 button:disabled{opacity:.4}
 .restartBtn{position:fixed;bottom:2rem;right:2rem;z-index:1000}
 
@@ -67,49 +73,50 @@ button:disabled{opacity:.4}
 #slideSum .sum-footer{margin-top:1rem;display:flex;justify-content:center}
 #slideSum .sum-footer .backBtn{padding:.9rem 1.2rem}
 
-/*──────────────────── 4 • RESULT SLIDES — MOBILE (≤640 px) ────────────────────*/
+/*──────────────── 4 ▸ RESULT SLIDES – MOBILE (≤640 px) ─*/
 @media (max-width:640px){
-  /* outer card behaves like a column: title — highlight — footer */
-  .slide .slide-content.estimation{padding:1.25rem;display:flex;flex-direction:column}
+  .slide .slide-content.estimation{
+    padding:1.25rem;display:flex;flex-direction:column;max-width:480px;width:100%}
+
+  /* stack:   title  •  highlight  •  buttons   */
   .est-grid{display:flex;flex-direction:column;gap:1.25rem}
-  
-  /* keep only the title from details‑table */
+
+  /* show only title line from the old “left” pane */
   .details-table{background:transparent;padding:0;margin:0}
-  .details-table .subhead,
-  .details-table table{display:none}
-  .details-table h1{font-size:clamp(1.4rem,6vw,1.8rem);margin:0 0 .5rem}
-  
-  /* highlight takes full width */
-  .highlight-table{background:rgba(255,255,255,.08);padding:1.25rem;border-radius:8px;align-items:flex-start;text-align:left}
-  .highlight-grid{gap:1.4rem;margin:0 0 1.3rem}
+  .details-table .subhead,.details-table table{display:none}
+  .details-table h1{font-size:clamp(1.4rem,6vw,1.8rem);margin:0}
+
+  /* highlight block uses full width */
+  .highlight-table{background:rgba(255,255,255,.08);padding:1.25rem;border-radius:8px;
+    align-items:flex-start;text-align:left}
+  .highlight-grid{gap:1.4rem;margin:0 0 1.2rem}
   .highlight-number{font-size:clamp(2.4rem,8vw,3rem);white-space:normal}
-  
-  /* buttons always stick to bottom of card */
+
+  /* buttons always locked to bottom of card */
   .highlight-footer{margin-top:auto}
-  .highlight-footer button,#slideSum .sum-footer button{flex:1 1 48%}
+  .highlight-footer button,
+  #slideSum .sum-footer button{flex:1 1 48%}
 }
 
-/* tiny‑width gutters */
+/* gutters for ultra‑narrow phones */
 @media (max-width:400px){
   .slide-content.inputs,
   .slide .slide-content.estimation{margin-inline:1rem}
 }
 
-/* height‑based font squeeze */
+/* height‑based tweaks to avoid scroll on short screens */
 @media (max-height:800px){
   .highlight-number{font-size:clamp(2.6rem,7vw,3rem)}
-  .highlight-grid{gap:1.1rem}
-}
+  .highlight-grid{gap:1rem}}
 @media (max-height:700px){
-  .highlight-number{font-size:clamp(2.3rem,7vw,2.7rem)}
-}
+  .highlight-number{font-size:clamp(2.3rem,7vw,2.7rem)}}
 
-/*──────────────────── 5 • UTILITIES ────────────────────*/
+/*──────────────── 5 ▸ UTILITIES ─────────────────────────*/
 .valItem{opacity:0;transform:translateX(-60px);transition:.6s ease}
 .valItem.show{opacity:1;transform:translateX(0)}
-input::-webkit-inner-spin-button,
-input::-webkit-outer-spin-button{display:none}
+input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{display:none}
 </style>
+
 
 
 
