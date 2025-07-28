@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -727,6 +727,12 @@
   let revLowS2L = 0, revHighS2L = 0;
   let revLowMiss = 0, revHighMiss = 0;
 
+  /* explicit skip markers */
+let skippedEst  = false;
+let skippedS2L  = false;
+let skippedMiss = false;
+
+
   /* UI helpers */
   function revealSlide(id) {
     document.querySelectorAll('.slide').forEach(s => s.style.display = 'none');
@@ -776,11 +782,12 @@
   /* 1) Inputs → Estimate Follow-Up */
   g('calcBtn').addEventListener('click', () => {
     const Q = +g('quotes').value;
-    const W3 = +g('quoteWins').value;
     const AR = +g('avgRev').value;
+    const W3 = +g('quoteWins').value;
 // === enhanced skip of Follow‑Up =========================================
 if (!Q && !W3) {
   revLowEst = revHighEst = 0;                // nothing from this campaign
+  skippedEst = true;              // <‑‑ NEW line
   g('toS2L').click();                        // programmatically continue flow
   return;
 }
@@ -793,6 +800,7 @@ if (!Q && !W3) {
     });
     revLowEst = revLow;
     revHighEst = revHigh;
+    skippedEst = false;
 
     g('estValues').innerHTML = [
       ['Quotes / mo',        Q],
@@ -811,10 +819,12 @@ if (!Q && !W3) {
   g('toS2L').addEventListener('click', () => {
     const F = +g('leads').value;
     const W1 = +g('formWins').value;
-    const AR = +g('avgRev').value;
+    
 // === enhanced skip of Speed‑to‑Lead (handles double‑skip) ===============
 if (!F && !W1) {
+  skippedS2L = true; 
   revLowS2L = revHighS2L = 0;               // this campaign contributes zero
+
 
   const M  = +g('missedCalls').value;
   const W2 = +g('missedWins').value;
@@ -822,8 +832,9 @@ if (!F && !W1) {
 
   // -------- CASE 2a: Missed‑Call inputs ALSO blank  --------------------
   if (!M && !W2) {
-    revLowMiss = revHighMiss = 0;           // nothing left – build summary now
-
+    skippedMiss = true; 
+  
+    
     const monthlyCost = +document.querySelector('input[name="plan"]').value || 0;
     const lowTotal  = revLowEst + revLowS2L + revLowMiss;
     const highTotal = revHighEst + revHighS2L + revHighMiss;
@@ -851,7 +862,8 @@ if (!F && !W1) {
   });
   revLowMiss  = revLow;
   revHighMiss = revHigh;
-
+  skippedMiss = false;
+  
   g('missValues').innerHTML = [
     ['Abandoned calls / mo', M],
     ['With Chiirp (low)',    lowWins.toFixed(1)],
@@ -874,7 +886,7 @@ if (!F && !W1) {
     });
     revLowS2L = revLow;
     revHighS2L = revHigh;
-
+    
     g('s2lValues').innerHTML = [
       ['Form submissions / mo', F],
       ['With Chiirp (low)',     lowWins.toFixed(1)],
@@ -895,6 +907,7 @@ if (!F && !W1) {
     const AR = +g('avgRev').value;
 // === skip Missed‑Call Recovery when both missed‑call inputs are blank ===
 if (!M && !W2) {
+  skippedMiss = true;
   revLowMiss = revHighMiss = 0;
 
   /* build summary immediately */
@@ -924,6 +937,7 @@ if (!M && !W2) {
     });
     revLowMiss = revLow;
     revHighMiss = revHigh;
+    skippedMiss = false;
 
     g('missValues').innerHTML = [
       ['Abandoned calls / mo', M],
@@ -969,10 +983,41 @@ g('toSum').addEventListener('click', () => {
 });
 
   /* back navigation */
-  g('backToInputs').addEventListener('click', () => revealSlide('slideInputs'));
-  g('backToEst').addEventListener('click',    () => revealSlide('slideEst'));
-  g('backToS2L').addEventListener('click',    () => revealSlide('slideS2L'));
-  g('backToMissed').addEventListener('click', () => revealSlide('slideMissed'));
+/* back navigation ------------------------------------------------------*/
+g('backToInputs').addEventListener('click', () => revealSlide('slideInputs'));
+
+/* ← from Speed‑to‑Lead */
+g('backToEst').addEventListener('click', () => {
+  // If the Estimate slide was skipped, jump straight to Inputs
+  revealSlide(skippedEst ? 'slideInputs' : 'slideEst');
+});
+
+/* ← from Missed‑Call Recovery */
+g('backToS2L').addEventListener('click', () => {
+  if (skippedS2L) {
+    // Speed‑to‑Lead was skipped; fall back to whichever slide exists
+    revealSlide(skippedEst ? 'slideInputs' : 'slideEst');
+  } else {
+    revealSlide('slideS2L');
+  }
+});
+
+/* ← from Summary */
+g('backToMissed').addEventListener('click', () => {
+  if (skippedMiss) {                              // Missed‑Call skipped
+    if (skippedS2L) {                             // S2L also skipped
+      revealSlide(skippedEst ? 'slideInputs' : 'slideEst');
+    } else {
+      revealSlide('slideS2L');
+    }
+  } else {
+    revealSlide('slideMissed');
+  }
+});
+/* ---------------------------------------------------------------------*/
+
+
+
 })();
 </script>
 
