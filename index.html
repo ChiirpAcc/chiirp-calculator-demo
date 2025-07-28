@@ -8,6 +8,7 @@
 /* ────────── SLIDE 1 “CARD” LAYOUT ────────── */
   .slide-content.inputs {
     background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
     border-radius: 12px;
     padding: 2rem;
     max-width: 600px;
@@ -84,6 +85,7 @@
 .slide .slide-content.estimation {
   position: relative;
   background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 2rem;
   /* width: max-content; */    /* ← remove this so the card can grow/shrink fluidly */
@@ -229,6 +231,19 @@
     flex: 1 1 50%;
   }
 }
+/* phones ≤375 px get side‑gutters so the card isn’t glued to the edge */
+@media (max-width: 400px){
+  .slide-content.inputs,
+  .slide .slide-content.estimation{
+    margin-inline:1rem;          /* left / right breathing room   */
+  }
+}
+@media (max-width: 480px){
+  .slide .slide-content.estimation .highlight-table{
+    align-items:flex-start;   /* not centre on extra‑narrow phones */
+    text-align:left;
+  }
+}
 
 /* Extra tweaks for phones ≤480px */
 @media (max-width: 480px) {
@@ -250,6 +265,25 @@
 }
 
 
+/*— card never grows taller than the viewport —*/
+.slide-content.inputs,
+.slide .slide-content.estimation{
+  max-height:100dvh;        /* dynamic vh = safe‑area aware */
+  overflow-y:auto;
+  overscroll-behavior:contain;   /* prevent body bounce */
+}
+
+@media (max-width: 480px){
+  .slide .slide-content.estimation .highlight-table{
+    align-items:flex-start;   /* not centre on extra‑narrow phones */
+    text-align:left;
+  }
+}
+@media (max-width: 360px){
+  .highlight-number{
+    font-size:clamp(2.1rem, 8.5vw, 2.8rem);
+  }
+}
 
   
 
@@ -274,7 +308,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -288,10 +322,13 @@
      SLIDE WRAPPER
   ───────────────────────────────────────────────────────────────────────────── */
   .slide {
+    position: absolute;
+    inset: 0;
+    display: grid;            /* ← RE-ADD this */
+    place-items: center;      /* ← RE-ADD this */
     text-align: center;
     padding: 2rem;
   }
-
   /* ─────────────────────────────────────────────────────────────────────────────
      HEADINGS
   ───────────────────────────────────────────────────────────────────────────── */
