@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #fcb900 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -783,6 +783,7 @@ let skippedMiss = false;
   g('calcBtn').addEventListener('click', () => {
     const Q = +g('quotes').value;
     const AR = +g('avgRev').value;
+    skippedS2L = false;
     const W3 = +g('quoteWins').value;
 // === enhanced skip of Follow‑Up =========================================
 if (!Q && !W3) {
@@ -818,6 +819,7 @@ if (!Q && !W3) {
   /* 2) Estimate → Speed-to-Lead */
   g('toS2L').addEventListener('click', () => {
     const F = +g('leads').value;
+    const AR = +g('avgRev').value;
     const W1 = +g('formWins').value;
     
 // === enhanced skip of Speed‑to‑Lead (handles double‑skip) ===============
@@ -828,7 +830,7 @@ if (!F && !W1) {
 
   const M  = +g('missedCalls').value;
   const W2 = +g('missedWins').value;
-  const AR = +g('avgRev').value;
+
 
   // -------- CASE 2a: Missed‑Call inputs ALSO blank  --------------------
   if (!M && !W2) {
