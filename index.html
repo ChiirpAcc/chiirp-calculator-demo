@@ -250,7 +250,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #fcb900 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
@@ -887,15 +887,7 @@ if (!M && !W2) {
     revealSlide('slideMissed');
   });
 
-  /* 4) Abandoned-Call → Summary */
-  g('toSum').addEventListener('click', () => {
-    const monthlyCost = +document.querySelector('input[name="plan"]').value || 0;
 
-    const lowTotal  = revLowEst  + revLowS2L  + revLowMiss;
-    const highTotal = revHighEst + revHighS2L + revHighMiss;
-
-    const roiLow  = monthlyCost > 0 ? lowTotal  / monthlyCost : 0;
-    const roiHigh = monthlyCost > 0 ? highTotal / monthlyCost : 0;
 
 /* 4) Abandoned‑Call → Summary */
 g('toSum').addEventListener('click', () => {
