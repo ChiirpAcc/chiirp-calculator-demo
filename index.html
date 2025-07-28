@@ -213,17 +213,39 @@
   text-align: center;      /* harmless with flex */
 }
 
-/* 8) Responsive: stack content, give each button 50 % width */
+
+/* 8) Responsive: stack content, give each button 50% width */
 @media (max-width: 640px) {
   .slide .slide-content.estimation .est-grid {
     grid-template-columns: 1fr;
-  css<br>@media (max-width: 480px) {<br> /* ‑‑‑ tighten the card and fonts */<br> .slide-content.inputs, /* slide 1 */<br> .slide .slide-content.estimation{padding:1.25rem;}<br><br> /* one‑column details card */<br> .slide .slide-content.estimation .details-table{width:100%;}<br><br> /* long numeric ranges can wrap */<br> .highlight-number{white-space:normal;font-size:clamp(2.4rem,9vw,3.2rem);}<br><br> /* inputs: full‑width, stacked */<br> .input-row input{flex:1 1 100%;}<br><br> /* main buttons span width */<br> button:not(.restartBtn){width:100%;}<br>}<br>
+  }
+  .slide .slide-content.estimation .details-table {
+    width: 100%;
   }
   .slide .slide-content.estimation .est-card {
     margin-bottom: 2rem;
   }
   .slide .slide-content.estimation .highlight-footer button {
-    flex: 1 1 50%;         /* each button fills half the row */
+    flex: 1 1 50%;
+  }
+}
+
+/* Extra tweaks for phones ≤480px */
+@media (max-width: 480px) {
+  .slide-content.inputs,
+  .slide .slide-content.estimation {
+    padding: 1.25rem;
+  }
+
+  .highlight-number {
+    white-space: normal;
+    font-size: clamp(2.4rem, 9vw, 3.2rem);
+  }
+
+  .input-row input,
+  button:not(.restartBtn) {
+    flex: 1 1 100%;
+    width: 100%;
   }
 }
 
@@ -252,7 +274,7 @@
     /* make it exactly big enough so its diagonal ≥ viewport diagonal */
     width:  calc(100vw + 100vh);
     height: calc(100vw + 100vh);
-    background: linear-gradient(130deg, #fcb900 0%, #000000 100%); /*0693e3              fcb900                                                    */
+    background: linear-gradient(130deg, #fcb900 0%, #0693e3 100%); /*0693e3              fcb900                                                    */
     transform: translate(-50%, -50%) rotate(0deg);
     transform-origin: center center;
     z-index: -1;
