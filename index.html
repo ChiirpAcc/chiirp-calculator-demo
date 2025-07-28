@@ -5,7 +5,7 @@
   <title>CHIIRP Demo – Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/*──────────────────── 1 • GLOBAL LAYOUT ────────────────────*/
+/*──────────────────── 1 • GLOBAL BASE ────────────────────*/
 html,body{margin:0;padding:0}
 body{
   position:relative;min-height:100vh;
@@ -14,21 +14,20 @@ body{
 body::before{
   content:"";position:fixed;top:50%;left:50%;
   width:calc(100vw + 100vh);height:calc(100vw + 100vh);
-  background:linear-gradient(130deg,#fcb900 0%,#000000 100%);
+  background:linear-gradient(130deg,#fcb900 0%,#000 100%);
   transform:translate(-50%,-50%) rotate(0deg);
   animation:spin-bg 20s linear infinite;z-index:-1}
 @keyframes spin-bg{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
 .slide{position:absolute;inset:0;display:grid;place-items:center;padding:2rem;text-align:center}
 
-/* shared “card” shell */
 .slide-content.inputs,
 .slide .slide-content.estimation{
   background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
   border-radius:12px;box-shadow:0 8px 24px #0003;
   max-height:100dvh;overflow-y:auto;overscroll-behavior:contain}
 
-/*──────────── 2 • INPUT SLIDE ────────────*/
+/*──────────────────── 2 • INPUT SLIDE (unchanged) ────────────────────*/
 .slide-content.inputs{padding:2rem;max-width:600px;width:100%}
 .slide-content.inputs h1{margin:.5rem 0;font-size:clamp(2.4rem,6vw,4rem)}
 .slide-content.inputs h2{margin:0 0 1.5rem;font-size:clamp(1.2rem,3vw,1.6rem);font-weight:300}
@@ -41,19 +40,19 @@ body::before{
 .plan-selector label:hover{background:rgba(255,255,255,.2)}
 .plan-selector input:checked+span{font-weight:700;text-decoration:underline}
 
-/*──────────── 3 • ESTIMATION SLIDES – DESKTOP (>640 px) ────────────*/
-.slide .slide-content.estimation{padding:2rem 2rem 5rem;position:relative}
-.est-grid{display:grid;grid-template-columns:360px minmax(auto,1fr);gap:5rem;align-items:stretch}
+/*──────────────────── 3 • RESULT SLIDES — DESKTOP (≥641 px) ────────────────────*/
+.slide .slide-content.estimation{padding:2rem 2rem 5rem;position:relative;display:grid;place-items:center}
+.est-grid{display:grid;grid-template-columns:360px minmax(auto,1fr);gap:5rem;align-items:start}
 
 .est-card{background:rgba(255,255,255,.08);border-radius:8px;padding:1.5rem;display:flex;flex-direction:column}
 
-.details-table h1{margin-bottom:.5rem}
+.details-table h1{margin-bottom:.6rem}
 .details-table .subhead{margin-bottom:1.3rem}
 .details-table table{width:100%;border-collapse:collapse;margin-bottom:1.3rem}
 .details-table th,.details-table td{padding:.6rem .8rem;border-bottom:1px solid #ffffff33;text-align:left}
 
-.highlight-table{text-align:center;align-items:center}
-.highlight-grid{display:flex;flex-direction:column;align-items:center;gap:3rem;width:100%;flex:1 0 auto;margin-bottom:3rem}
+.highlight-table{align-items:center;text-align:center}
+.highlight-grid{display:flex;flex-direction:column;align-items:center;gap:3rem;margin-bottom:3rem;width:100%}
 .highlight-number{font-size:clamp(3.2rem,7vw,5rem);white-space:nowrap;line-height:1.05;color:#ffeb3b;font-weight:700;text-shadow:0 2px 6px #0006}
 .highlight-pair{display:flex;flex-direction:column;align-items:center;gap:.35rem}
 .subtext{font-size:1rem;letter-spacing:.05rem;text-transform:uppercase;margin:0}
@@ -68,43 +67,50 @@ button:disabled{opacity:.4}
 #slideSum .sum-footer{margin-top:1rem;display:flex;justify-content:center}
 #slideSum .sum-footer .backBtn{padding:.9rem 1.2rem}
 
-/*──────────── 4 • MOBILE LAYOUT (≤640 px) ────────────*/
+/*──────────────────── 4 • RESULT SLIDES — MOBILE (≤640 px) ────────────────────*/
 @media (max-width:640px){
-  /* turn outer grid into vertical flex‑stack */
-  .est-grid{display:flex;flex-direction:column;gap:1.5rem}
-  .est-card{width:100%;margin:0}
-  /* details above highlight */
-  .highlight-table{text-align:left;align-items:flex-start}
+  /* outer card behaves like a column: title — highlight — footer */
+  .slide .slide-content.estimation{padding:1.25rem;display:flex;flex-direction:column}
+  .est-grid{display:flex;flex-direction:column;gap:1.25rem}
+  
+  /* keep only the title from details‑table */
+  .details-table{background:transparent;padding:0;margin:0}
+  .details-table .subhead,
+  .details-table table{display:none}
+  .details-table h1{font-size:clamp(1.4rem,6vw,1.8rem);margin:0 0 .5rem}
+  
+  /* highlight takes full width */
+  .highlight-table{background:rgba(255,255,255,.08);padding:1.25rem;border-radius:8px;align-items:flex-start;text-align:left}
+  .highlight-grid{gap:1.4rem;margin:0 0 1.3rem}
   .highlight-number{font-size:clamp(2.4rem,8vw,3rem);white-space:normal}
-  .highlight-grid{gap:1.5rem;margin-bottom:1.2rem}
-  /* push buttons to bottom without absolute positioning */
+  
+  /* buttons always stick to bottom of card */
   .highlight-footer{margin-top:auto}
   .highlight-footer button,#slideSum .sum-footer button{flex:1 1 48%}
-  .slide-content.inputs,
-  .slide .slide-content.estimation{padding:1.25rem}
 }
 
-/* small‑width gutters */
+/* tiny‑width gutters */
 @media (max-width:400px){
   .slide-content.inputs,
   .slide .slide-content.estimation{margin-inline:1rem}
 }
 
-/* height‑sensitive font shrink */
+/* height‑based font squeeze */
 @media (max-height:800px){
   .highlight-number{font-size:clamp(2.6rem,7vw,3rem)}
-  .highlight-grid{gap:1.2rem;margin-bottom:1rem}
+  .highlight-grid{gap:1.1rem}
 }
 @media (max-height:700px){
   .highlight-number{font-size:clamp(2.3rem,7vw,2.7rem)}
 }
 
-/*──────────── 5 • UTILS ────────────*/
+/*──────────────────── 5 • UTILITIES ────────────────────*/
 .valItem{opacity:0;transform:translateX(-60px);transition:.6s ease}
 .valItem.show{opacity:1;transform:translateX(0)}
 input::-webkit-inner-spin-button,
 input::-webkit-outer-spin-button{display:none}
 </style>
+
 
 
 
